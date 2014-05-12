@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+/* CSS goes here. */
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script>
+
+var width = 960,
+    height = 1160;
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var extents;
+
+d3.json("mapdata/pointextent.json", function(error, edges) {
+	extents = edges;
+
+	var xspan = extents.east - extents.west;
+	console.log('xw:' + xspan);
+	var yspan = extents.south - extents.north;
+	console.log('yw:' + yspan);
+
+	d3.json("mapdata/stops.json", function(error, stops) {
+
+ 		var stopx, stopy;
+ 		console.log(stops);
+
+ 		var stop_positions = [];
+
+ 		for (var i = stops.length - 1; i >= 0; i--) {
+ 			if (stops[i].location_type == 1) {
+ 				stopx = (stops[i].stop_lon - extents.west)/xspan*width;
+ 				stopy = (stops[i].stop_lat - extents.north)/yspan*height;
+ 				//draw a circle at stopx, stopy with id stop_id and alt text stop_name
+ 				console.log("Stop " + i + ", " + stops[i].stop_name + ", is at " + stopx + ", " + stopy);
+ 				stop_positions.push({"x": stopx, "y": stopy, "name": stops[i].stop_name, "id": stops[i].stop_id});
+
+ 			}
+ 		};
+
+ 		svg.selectAll('stopcircle')
+ 		.data(stop_positions)
+ 		.enter().append('circle')
+ 		.attr('cx', function(d){return d.x;})
+ 		.attr('cy', function(d){return d.y;})
+ 		.attr('data-id', function(d){return d.id;})
+ 		.attr('data-name', function(d){return d.name;})
+ 		.attr('r', 1);
+	});
+});
+
+</script>
