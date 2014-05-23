@@ -1,0 +1,28 @@
+.inactive {
+	stroke: #333333;
+	fill: #FFFFFF;
+}
+.intransitto {
+
+}
+.incomingat {
+
+}
+.stoppedat {
+
+}
+
+.line1 .line2 .line3 {
+	stroke: #EE352E;
+	fill: #EE352E;
+}
+
+.line4 .line5 .line6 {
+	stroke: #00933C;
+	fill: #00933C;
+}
+
+.lineg {
+	stroke: #808183;
+	fill: #808183;
+}
