@@ -58,14 +58,32 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
 	});
 });
 
+		var blanker = new WebSocket('ws://localhost:7070/ws/1');
+		blanker.onmessage = function(event){
+			//when the ticker ticks, clear all the stops from blinking / being special
+			svg.selectAll('circle').attr('class', 'inactive');
+			console.log('clearing');
+		}
+
  		var socket = new WebSocket('ws://localhost:7070/ws/19');
- 		console.log(socket.url);
  		socket.onmessage = function(event){
- 			// var train = JSON.parse(event.data);
- 			// var target_stop_id  = train.stop_id.substring(0,3);
+ 			var train = JSON.parse(event.data);
+ 			var target_stop_id  = train.stop_id.substring(0,3);
+ 			
+ 			var stopdot = d3.select('[data-id="' + target_stop_id + '"]');
+ 			console.log("Selected stop " + target_stop_id);
+
+ 			var route = "line" + train.trip.route_id.substring(0,1).toLowerCase();
+ 			console.log("Selected train is on " + route);
+
+ 			var status = train.current_status_text.replace(/ /g, "").toLowerCase();
+ 			console.log("Selected train is " + status);
+
+ 			stopdot.attr('class', route + " " + status);
+ 			
  			// // need to look up the stop name maybe?
  			// console.log ("Train " + train.current_status_text.toLowerCase() + " at stop id " + target_stop_id);
- 			console.log('tick');
+ 			//console.log('tick');
  		}
 
 </script>

@@ -2,22 +2,52 @@
 	stroke: #333333;
 	fill: #FFFFFF;
 }
-.intransitto {
 
+.intransitto {
+	-webkit-animation: pulse 2s linear infinite;
 }
 .incomingat {
-
+	-webkit-animation: pulse 0.5s linear infinite;
 }
 .stoppedat {
-
+	stroke-width: 2px;
 }
 
-.line1 .line2 .line3 {
+@-webkit-keyframes pulse {
+	0% {
+		opacity:1.0;
+	}
+	100% {
+		opacity:.25;
+	}
+}
+
+.line1 {
 	stroke: #EE352E;
 	fill: #EE352E;
 }
 
-.line4 .line5 .line6 {
+.line2 {
+	stroke: #EE352E;
+	fill: #EE352E;
+}
+
+.line3 {
+	stroke: #EE352E;
+	fill: #EE352E;
+}
+
+.line4{
+	stroke: #00933C;
+	fill: #00933C;
+}
+
+.line5{
+	stroke: #00933C;
+	fill: #00933C;
+}
+
+.line6{
 	stroke: #00933C;
 	fill: #00933C;
 }
