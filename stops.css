@@ -22,32 +22,12 @@
 	}
 }
 
-.line1 {
+.line1, .line2, .line3 {
 	stroke: #EE352E;
 	fill: #EE352E;
 }
 
-.line2 {
-	stroke: #EE352E;
-	fill: #EE352E;
-}
-
-.line3 {
-	stroke: #EE352E;
-	fill: #EE352E;
-}
-
-.line4{
-	stroke: #00933C;
-	fill: #00933C;
-}
-
-.line5{
-	stroke: #00933C;
-	fill: #00933C;
-}
-
-.line6{
+.line4, .line5, .line6 {
 	stroke: #00933C;
 	fill: #00933C;
 }
