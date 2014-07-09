@@ -33,6 +33,11 @@
 }
 
 .lineg {
-	stroke: #808183;
-	fill: #808183;
+	stroke: #6D6E71;
+	fill: #6D6E71;
+}
+
+.linel {
+	stroke: #A7A9AC;
+	fill: #A7A9AC;	
 }

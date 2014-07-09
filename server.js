@@ -8,7 +8,7 @@ var app = express();
 
 dotenv.load();
 var MTA_KEY     = process.env.MTA_KEY;
-var MTA_FEED_ID = process.env.MTA_FEED_ID || 1;
+var MTA_FEED_ID = process.env.MTA_FEED_ID || 2;
 var PORT        = process.env.PORT || 3000;
 var URL         = "http://datamine.mta.info/mta_esi.php?key=" + MTA_KEY
                 + "&feed_id=" + MTA_FEED_ID;
@@ -35,6 +35,15 @@ csvconverter.on("end_parsed", function(jsonobj){
 // csvconverter.from(STOPFILE);
 fileStream.pipe(csvconverter);
 
+//L Train line taken from stop_times.txt
+ltrainmapS = [null,"L01","L02","L03","L05","L06","L08","L10","L11","L12","L13","L14","L15","L16","L17","L19","L20","L21","L22","L24","L25","L26","L27","L28","L29"];
+
+//Northbound L is reverse of Southbound L, but null has to be in 0th position
+ltrainmapN = ltrainmapS;
+ltrainmapN.shift();
+ltrainmapN.reverse();
+ltrainmapN.unshift(null);
+
 //modify the JSON we get from parsing GTFS to include only what we need / reformat some data
 function squishjson(msg) {
 	var entities = msg.entity;
@@ -44,7 +53,22 @@ function squishjson(msg) {
       var tempdate = new Date(entities[i].vehicle.timestamp.low * 1000);
       entities[i].vehicle.datetime = tempdate.toISOString();
       entities[i].vehicle.current_status_text = current_status_enum[entities[i].vehicle.current_status];
-      entities[i].vehicle.stop_details = stopLookup[entities[i].vehicle.stop_id];
+      if (entities[i].vehicle.stop_id){
+        entities[i].vehicle.stop_details = stopLookup[entities[i].vehicle.stop_id];
+      }
+      else
+      {
+        var seqnum = entities[i].vehicle.current_stop_sequence;
+        var actualstop = "blah";
+        //console.log(entities[i].vehicle.trip.trip_id);
+        if(entities[i].vehicle.trip.trip_id.slice(-1) == "N")
+          actualstop = ltrainmapN[seqnum];
+        else
+          actualstop = ltrainmapS[seqnum];
+        console.log(actualstop);
+        entities[i].vehicle.stop_id = actualstop;
+        entities[i].vehicle.stop_details = stopLookup[actualstop];
+      }
       returnarray.push(entities[i].vehicle);
     }
   }
@@ -52,6 +76,16 @@ function squishjson(msg) {
 }
 
 app.get('/', function(req, out) {
+  if (req.query.feed > 0) {
+    MTA_FEED_ID = req.query.feed;
+  }
+  else
+  {
+    MTA_FEED_ID = 1;
+  }
+
+  var URL = "http://datamine.mta.info/mta_esi.php?key=" + MTA_KEY + "&feed_id=" + MTA_FEED_ID;
+
   return http.get(URL, function(res) {
     var data;
     data = [];
