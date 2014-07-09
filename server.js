@@ -3,6 +3,7 @@ var ProtoBuf = require("protobufjs");
 var dotenv = require('dotenv');
 var express = require('express');
 var Converter = require('csvtojson').core.Converter;
+var fs = require("fs");
 var app = express();
 
 dotenv.load();
@@ -19,18 +20,20 @@ var decoder = builder.build("transit_realtime").FeedMessage;
 var current_status_enum = ["INCOMING AT", "STOPPED AT", "IN TRANSIT TO"];
 
 //build a lookup array of objects for the station lookups
-var csvconverter = new Converter();
+
+var fileStream = fs.createReadStream(STOPFILE);
+var csvconverter = new Converter({constructResult:true});
 var stopLookup = {};
 csvconverter.on("end_parsed", function(jsonobj){
-  ray = jsonobj.csvRows;
+  var ray = jsonobj; //was jsonobj.csvRows;
   for (var i = ray.length - 1; i >= 0; i--) {
     stopLookup[ray[i].stop_id] = {id:ray[i].stop_id, name:ray[i].stop_name, lat:ray[i].stop_lat, lon:ray[i].stop_lon};
   };
 
 });
 
-csvconverter.from(STOPFILE);
-
+// csvconverter.from(STOPFILE);
+fileStream.pipe(csvconverter);
 
 //modify the JSON we get from parsing GTFS to include only what we need / reformat some data
 function squishjson(msg) {
