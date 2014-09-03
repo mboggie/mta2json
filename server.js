@@ -65,7 +65,7 @@ function squishjson(msg) {
           actualstop = ltrainmapN[seqnum];
         else
           actualstop = ltrainmapS[seqnum];
-        console.log(actualstop);
+        //console.log(actualstop);
         entities[i].vehicle.stop_id = actualstop;
         entities[i].vehicle.stop_details = stopLookup[actualstop];
       }
@@ -95,10 +95,15 @@ app.get('/', function(req, out) {
     return res.on("end", function() {
       var msg;
       data = Buffer.concat(data);
-      msg = decoder.decode(data);
-      msg = squishjson(msg);
-      console.log("proxying request for " + req.ip);
-      return out.send(msg);
+      try { 
+        msg = decoder.decode(data);
+        msg = squishjson(msg);
+        console.log("proxying request for " + req.ip);
+        return out.send(msg);
+      }
+      catch(error) {
+        console.log("Failed to retrieve train data. Will retry on next request.");
+      }
     });
   });
 });
