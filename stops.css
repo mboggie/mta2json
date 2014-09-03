@@ -1,10 +1,13 @@
 .inactive {
-	stroke: #333333;
+	stroke: #FFFFFF;
 	fill: #FFFFFF;
+	z-index: -1000;
 }
 
 .intransitto {
-	-webkit-animation: pulse 2s linear infinite;
+	/*-webkit-animation: pulse 2s linear infinite;*/
+	fill: none !important; 
+	stroke-width:1px !important;
 }
 .incomingat {
 	-webkit-animation: pulse 0.5s linear infinite;
