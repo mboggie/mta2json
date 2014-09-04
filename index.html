@@ -10,11 +10,16 @@
 <script>
 
 var width = 960,
-    height = 1160;
+    height = 1131; //aspect ratio of extents is approx 1:1.8
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
-    .attr("height", height);
+    .attr("height", height)
+    .attr("class", "svgmap");
+
+var defs = svg.append('defs');
+
+
 
 var extents;
 
@@ -22,13 +27,49 @@ var extents;
 
 d3.json("mapdata/pointextent.json", function(error, edges) {
 	extents = edges;
+	var centerlon = (extents.west-extents.east)/2;
+	var centerlat = (extents.north-extents.south)/2;
+
+	centerlon = centerlon + extents.east;
+	centerlat = centerlat + extents.south;
+	
+	//set a background image where this map is located
+	bgurl = "http://api.tiles.mapbox.com/v4/mboggie.jdna5g96/"+centerlon+","+centerlat+",12/"+width+"x"+height+".png64?access_token=pk.eyJ1IjoibWJvZ2dpZSIsImEiOiIyaFpVeU9rIn0.9XvdKyRmTIxfZz3wddfUtw";
+
+	defs
+		.append('svg:pattern')
+		.attr('id', 'bgmap')
+		.attr('patternUnits', 'userSpaceOnUse')
+		.attr('width', width)
+		.attr('height', height)
+		.append('svg:image')
+		.attr('xlink:href', bgurl)
+		.attr('x', 0)
+		.attr('y', 0)
+		.attr('width', width)
+		.attr('height', height);
+	
+	svg.append('rect')
+		.attr("class", "svgmap")
+		.attr('x', 0)
+		.attr('y', 0)
+		.attr('width', width)
+		.attr('height', height);
+
+	var mapmargin = 0.005;
+	extents.east += mapmargin;
+	extents.west -= mapmargin;
+	extents.north += mapmargin;
+	extents.south -= mapmargin;
 
 	var xspan = extents.east - extents.west;
-	xspan = xspan + 0.04;
+	xspan = xspan;
 	console.log('xw:' + xspan);
 	var yspan = extents.south - extents.north;
-	yspan = yspan+0.04;
+	yspan = yspan;
 	console.log('yw:' + yspan);
+	console.log('geo aspect ratio:' + xspan +'/'+ yspan);
+	console.log('img aspect ratio:' + width + '/' + height);
 
 	d3.json("mapdata/stops.json", function(error, stops) {
 
@@ -36,14 +77,21 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
  		console.log(stops);
 
  		var stop_positions = [];
+ 		var stoploc = [];
+ 		var projection = d3.geo.mercator()
+ 		  			.center([centerlon, centerlat])
+  					.scale(171000)
+  					.translate([(width) / 2, (height)/2]);
 
  		for (var i = stops.length - 1; i >= 0; i--) {
  			if (stops[i].location_type == 1) {
- 				stopx = (stops[i].stop_lon - extents.west)/xspan*width;
- 				stopy = (stops[i].stop_lat - extents.north)/yspan*height;
+ 				stoploc = projection([stops[i].stop_lon, stops[i].stop_lat]);
+
+ 				// stopx = (stops[i].stop_lon - extents.west)/xspan*(width);
+ 				// stopy = (stops[i].stop_lat - extents.north)/yspan*(height);
  				//draw a circle at stopx, stopy with id stop_id and alt text stop_name
  				//console.log("Stop " + i + ", " + stops[i].stop_name + ", is at " + stopx + ", " + stopy);
- 				stop_positions.push({"x": stopx, "y": stopy, "name": stops[i].stop_name, "id": stops[i].stop_id});
+ 				stop_positions.push({"x": stoploc[0], "y": stoploc[1], "name": stops[i].stop_name, "id": stops[i].stop_id});
 
  			}
  		};
@@ -62,12 +110,12 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
 	});
 });
 
-		var blanker = new WebSocket('ws://localhost:7070/ws/1');
-		blanker.onmessage = function(event){
-			//when the ticker ticks, clear all the stops from blinking / being special
-			svg.selectAll('circle').attr('class', 'inactive');
-			console.log('clearing');
-		}
+		// var blanker = new WebSocket('ws://localhost:7070/ws/1');
+		// blanker.onmessage = function(event){
+		// 	//when the ticker ticks, clear all the stops from blinking / being special
+		// 	svg.selectAll('circle').attr('class', 'inactive');
+		// 	console.log('clearing');
+		// }
 
  		var socket = new WebSocket('ws://localhost:7070/ws/19');
  		socket.onmessage = function(event){

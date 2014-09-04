@@ -47,3 +47,7 @@
 	stroke: #A7A9AC;
 	fill: #A7A9AC;	
 }
+
+.svgmap {
+	fill: url(#bgmap);
+}

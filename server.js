@@ -12,7 +12,7 @@ var MTA_FEED_ID = process.env.MTA_FEED_ID || 2;
 var PORT        = process.env.PORT || 3000;
 var URL         = "http://datamine.mta.info/mta_esi.php?key=" + MTA_KEY
                 + "&feed_id=" + MTA_FEED_ID;
-var STOPFILE    = "./stops.txt";
+var STOPFILE    = "./mapdata/stops.json";
 
 var builder = ProtoBuf.loadProtoFile("lib/protos/nyct-subway.proto");
 var decoder = builder.build("transit_realtime").FeedMessage;
@@ -21,19 +21,16 @@ var current_status_enum = ["INCOMING AT", "STOPPED AT", "IN TRANSIT TO"];
 
 //build a lookup array of objects for the station lookups
 
-var fileStream = fs.createReadStream(STOPFILE);
-var csvconverter = new Converter({constructResult:true});
 var stopLookup = {};
-csvconverter.on("end_parsed", function(jsonobj){
-  var ray = jsonobj; //was jsonobj.csvRows;
+
+fs.readFile(STOPFILE, "utf8", function(err, data) {
+  //doesn't do anything to the data incoming, since we're reading from a JSON file
+  var ray = data;
   for (var i = ray.length - 1; i >= 0; i--) {
     stopLookup[ray[i].stop_id] = {id:ray[i].stop_id, name:ray[i].stop_name, lat:ray[i].stop_lat, lon:ray[i].stop_lon};
   };
 
 });
-
-// csvconverter.from(STOPFILE);
-fileStream.pipe(csvconverter);
 
 //L Train line taken from stop_times.txt
 ltrainmapS = [null,"L01","L02","L03","L05","L06","L08","L10","L11","L12","L13","L14","L15","L16","L17","L19","L20","L21","L22","L24","L25","L26","L27","L28","L29"];
