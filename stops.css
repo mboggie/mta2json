@@ -1,6 +1,6 @@
 .inactive {
-	stroke: #FFFFFF;
-	fill: #FFFFFF;
+	stroke: #cccccc;
+	fill: none;
 	z-index: -1000;
 }
 
@@ -8,12 +8,15 @@
 	/*-webkit-animation: pulse 2s linear infinite;*/
 	fill: none !important; 
 	stroke-width:1px !important;
+	z-index:10;
 }
 .incomingat {
 	-webkit-animation: pulse 0.5s linear infinite;
+	z-index:20;
 }
 .stoppedat {
 	stroke-width: 2px;
+	z-index:30;
 }
 
 @-webkit-keyframes pulse {

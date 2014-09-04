@@ -18,12 +18,16 @@ var svg = d3.select("body").append("svg")
 
 var extents;
 
+//begin refactoring here - calculate extents within the stops parsing and ignore Staten Island stops
+
 d3.json("mapdata/pointextent.json", function(error, edges) {
 	extents = edges;
 
 	var xspan = extents.east - extents.west;
+	xspan = xspan + 0.04;
 	console.log('xw:' + xspan);
 	var yspan = extents.south - extents.north;
+	yspan = yspan+0.04;
 	console.log('yw:' + yspan);
 
 	d3.json("mapdata/stops.json", function(error, stops) {
