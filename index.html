@@ -34,7 +34,7 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
 	centerlat = centerlat + extents.south;
 	
 	//set a background image where this map is located
-	bgurl = "http://api.tiles.mapbox.com/v4/mboggie.jdna5g96/"+centerlon+","+centerlat+",12/"+width+"x"+height+".png64?access_token=pk.eyJ1IjoibWJvZ2dpZSIsImEiOiIyaFpVeU9rIn0.9XvdKyRmTIxfZz3wddfUtw";
+	bgurl = "http://api.tiles.mapbox.com/v4/mboggie.jdna5g96/"+(centerlon+0.002)+","+centerlat+",12/"+width+"x"+height+".png64?access_token=pk.eyJ1IjoibWJvZ2dpZSIsImEiOiIyaFpVeU9rIn0.9XvdKyRmTIxfZz3wddfUtw";
 
 	defs
 		.append('svg:pattern')
@@ -102,7 +102,7 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
  		.enter().append('circle')
  		.attr('cx', function(d){return d.x;})
  		.attr('cy', function(d){return d.y;})
- 		.attr('class', 'inactive')
+ 		.attr('class', 'station')
  		.attr('data-id', function(d){return d.id;})
  		.attr('data-name', function(d){return d.name;})
  		.attr('r', 2);
@@ -122,15 +122,14 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
  			var train = JSON.parse(event.data);
  			if(train.stop_id !== null){
 	 			var target_stop_id  = train.stop_id.substring(0,3);
+	 			var train_id = train.trip.nyct_trip_descriptor.train_id.replace(/ /g, '');
+	 			console.log(train_id);
 	 			
 	 			var stopdot = d3.select('[data-id="' + target_stop_id + '"]');
-	 			console.log("Selected stop " + target_stop_id);
 
 	 			var route = "line" + train.trip.route_id.substring(0,1).toLowerCase();
-	 			console.log("Selected train is on " + route);
 
 	 			var status = train.current_status_text.replace(/ /g, "").toLowerCase();
-	 			console.log("Selected train is " + status);
 
 	 			stopdot.attr('class', route + " " + status);
 	 			

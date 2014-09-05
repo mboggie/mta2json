@@ -1,6 +1,6 @@
-.inactive {
-	stroke: #cccccc;
+.station {
 	fill: none;
+	stroke: #cccccc;
 	z-index: -1000;
 }
 
@@ -28,6 +28,31 @@
 	}
 }
 
+.linea, .linec, .linee {
+	stroke: #2850AD;
+	fill: #2850AD;
+}
+
+.lineb, .lined, .linef, .linem {
+	stroke: #FF6319;
+	fill: #FF6319;
+}
+
+.linen, .liner, .lineq {
+	stroke: #FCCC0A;
+	fill: #FCCC0A;
+}
+
+.lineg {
+	stroke: #6CBE45;
+	fill: #6CBE45;
+}
+
+.linej, .linez {
+	stroke: #996633;
+	fill: #996633;
+}
+
 .line1, .line2, .line3 {
 	stroke: #EE352E;
 	fill: #EE352E;
@@ -38,9 +63,14 @@
 	fill: #00933C;
 }
 
-.lineg {
-	stroke: #6D6E71;
-	fill: #6D6E71;
+.line7 {
+	stroke: #B933AD;
+	fill: #B933AD;
+}
+
+.lines {
+	stroke: #808183;
+	fill: #808183;
 }
 
 .linel {
