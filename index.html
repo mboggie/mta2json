@@ -122,7 +122,7 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
  			var train = JSON.parse(event.data);
  			if(train.stop_id !== null){
 	 			var target_stop_id  = train.stop_id.substring(0,3);
-	 			var train_id = train.trip.nyct_trip_descriptor.train_id.replace(/ /g, '');
+	 			var train_id = train.trip.nyct_trip_descriptor.train_id.replace(/ /g, '').replace(/\//g, '').replace(/\+/g, '');
 	 			console.log(train_id);
 	 			
 	 			var stopdot = d3.select('[data-id="' + target_stop_id + '"]');
@@ -131,8 +131,50 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
 
 	 			var status = train.current_status_text.replace(/ /g, "").toLowerCase();
 
-	 			stopdot.attr('class', route + " " + status);
+	 			//stopdot.attr('class', route + " " + status);
 	 			
+	 			// see if a train exists
+
+	 			var movingtrain = d3.select('[data-id="t' + train_id + '"]');
+	 			if(movingtrain.empty()){
+	 				//make a train
+	 				svg.append("path")
+	 				.attr('d', d3.svg.symbol().type("triangle-up"))
+	 				.attr('class', "train " + route + " " + status)
+	 				.attr('data-id', "t"+train_id);
+
+	 				movingtrain = d3.select('[data-id="t' + train_id + '"]');
+
+	 			}
+
+	 			//move the train to its new location
+	 			var rotation = 0;
+	 			var offx = 0;
+	 			var offy = 0;
+	 			var offw = movingtrain.node().getBBox().width;
+	 			console.log(offw);
+	 			offw = offw/2;
+	 			switch (train.trip.nyct_trip_descriptor.direction) {
+	 				case 1:
+	 					rotation = 0;
+	 					offx = offw;
+	 					break;
+	 				case 2:
+	 					rotation = 90;
+	 					offy = 0-offw;
+	 					break;
+	 				case 3: 
+	 					rotation = 180;
+	 					offx = 0-offw;
+	 					break;
+	 				case 4: 
+	 					rotation = 270;
+	 					offy = offw;
+	 					break;
+	 			}
+
+	 			movingtrain.attr("transform", "translate(" + parseInt(parseInt(stopdot.attr('cx'))+offx) + " " + parseInt(stopdot.attr('cy')+offy) + "), rotate(" + rotation + ")");
+
 	 			// // need to look up the stop name maybe?
 	 			// console.log ("Train " + train.current_status_text.toLowerCase() + " at stop id " + target_stop_id);
 	 			//console.log('tick');

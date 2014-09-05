@@ -4,6 +4,10 @@
 	z-index: -1000;
 }
 
+.train {
+	opacity: 0.4;
+}
+
 .intransitto {
 	/*-webkit-animation: pulse 2s linear infinite;*/
 	fill: none !important; 
