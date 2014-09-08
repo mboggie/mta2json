@@ -123,28 +123,29 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
  			if(train.stop_id !== null){
 	 			var target_stop_id  = train.stop_id.substring(0,3);
 	 			var train_id = train.trip.nyct_trip_descriptor.train_id.replace(/ /g, '').replace(/\//g, '').replace(/\+/g, '');
-	 			console.log(train_id);
-	 			
 	 			var stopdot = d3.select('[data-id="' + target_stop_id + '"]');
-
 	 			var route = "line" + train.trip.route_id.substring(0,1).toLowerCase();
-
 	 			var status = train.current_status_text.replace(/ /g, "").toLowerCase();
 
 	 			//stopdot.attr('class', route + " " + status);
 	 			
 	 			// see if a train exists
-
+	 			var newtrain = false;
 	 			var movingtrain = d3.select('[data-id="t' + train_id + '"]');
 	 			if(movingtrain.empty()){
 	 				//make a train
+	 				newtrain = true;
 	 				svg.append("path")
-	 				.attr('d', d3.svg.symbol().type("triangle-up"))
+	 				.attr('d', d3.svg.symbol().type("triangle-up").size(32))
 	 				.attr('class', "train " + route + " " + status)
 	 				.attr('data-id', "t"+train_id);
 
 	 				movingtrain = d3.select('[data-id="t' + train_id + '"]');
 
+	 			}
+	 			else{
+	 				console.log(movingtrain.attr('class') + " moving to " + route + " " + status);
+	 				movingtrain.attr('class', "train " + route + " " + status);
 	 			}
 
 	 			//move the train to its new location
@@ -152,7 +153,6 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
 	 			var offx = 0;
 	 			var offy = 0;
 	 			var offw = movingtrain.node().getBBox().width;
-	 			console.log(offw);
 	 			offw = offw/2;
 	 			switch (train.trip.nyct_trip_descriptor.direction) {
 	 				case 1:
@@ -173,11 +173,43 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
 	 					break;
 	 			}
 
-	 			movingtrain.attr("transform", "translate(" + parseInt(parseInt(stopdot.attr('cx'))+offx) + " " + parseInt(stopdot.attr('cy')+offy) + "), rotate(" + rotation + ")");
+	 			var movex, movey;
 
-	 			// // need to look up the stop name maybe?
-	 			// console.log ("Train " + train.current_status_text.toLowerCase() + " at stop id " + target_stop_id);
-	 			//console.log('tick');
+	 			if(newtrain) {
+	 				movingtrain.attr("transform", "translate(" + parseInt(parseInt(stopdot.attr('cx'))+offx) + "," + parseInt(stopdot.attr('cy')+offy) + ")rotate(" + rotation + ")");
+	 			}
+	 			else
+	 			{
+	 				if(status == "intransitto"){
+	 					console.log(status + ":" + movingtrain.attr('data-id') + " toward " + stopdot.attr('data-name'));
+	 					//TODO: Note that this algorithm creates a Zeno's Paradox effect. Not terrible, but a little weird.
+						//find where the train is now
+						var curx = d3.transform(movingtrain.attr("transform")).translate[0];
+						var cury = d3.transform(movingtrain.attr("transform")).translate[1];
+						// remove the offsets given to this train previously, so now its coordinates match that of its stop
+						curx -= offx;
+						cury -= offy;
+						//  calculate half-way between where we are and where we're going
+						movex = (stopdot.attr('cx') - curx)/2;
+						movey = (stopdot.attr('cy') - cury)/2;
+						// add halfway to new stop
+						movex += curx;
+						movey += cury;
+						console.log("moving transiting train to " + movex + ", " + movey + " en route to " + stopdot.attr('cx') + ", " + stopdot.attr('cy'));
+
+					}
+					else
+					{
+						// move to the station 
+						movex = stopdot.attr('cx');
+						movey = stopdot.attr('cy');
+					}
+
+
+
+	 				movingtrain.transition().duration(500).attr("transform", "translate(" + parseInt(movex+offx) + "," + parseInt(movey+offy) + ")rotate(" + rotation + ")");
+	 			}
+
 	 		}
  		}
 

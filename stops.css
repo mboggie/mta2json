@@ -6,20 +6,21 @@
 
 .train {
 	opacity: 0.4;
+	stroke-width:1px !important;
 }
 
 .intransitto {
 	/*-webkit-animation: pulse 2s linear infinite;*/
 	fill: none !important; 
-	stroke-width:1px !important;
 	z-index:10;
 }
 .incomingat {
 	-webkit-animation: pulse 0.5s linear infinite;
+	fill: none !important; 
 	z-index:20;
 }
 .stoppedat {
-	stroke-width: 2px;
+	opacity: 1.0;
 	z-index:30;
 }
 
