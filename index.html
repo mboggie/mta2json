@@ -90,7 +90,6 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
  				// stopx = (stops[i].stop_lon - extents.west)/xspan*(width);
  				// stopy = (stops[i].stop_lat - extents.north)/yspan*(height);
  				//draw a circle at stopx, stopy with id stop_id and alt text stop_name
- 				//console.log("Stop " + i + ", " + stops[i].stop_name + ", is at " + stopx + ", " + stopy);
  				stop_positions.push({"x": stoploc[0], "y": stoploc[1], "name": stops[i].stop_name, "id": stops[i].stop_id});
 
  			}
@@ -110,12 +109,17 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
 	});
 });
 
-		// var blanker = new WebSocket('ws://localhost:7070/ws/1');
-		// blanker.onmessage = function(event){
-		// 	//when the ticker ticks, clear all the stops from blinking / being special
-		// 	svg.selectAll('circle').attr('class', 'inactive');
-		// 	console.log('clearing');
-		// }
+		var ticker = new WebSocket('ws://localhost:7070/ws/1');
+		ticker.onmessage = function(event){
+			//when the ticker ticks, clean up old trains
+			//  1 = recently active
+			//  0 = unsure
+			// -1 = no longer active
+
+			d3.selectAll('[data-active="-1"]').remove();
+			d3.selectAll('[data-active="0"]').attr('data-active', -1);
+			d3.selectAll('[data-active="1"]').attr('data-active', 0);
+		}
 
  		var socket = new WebSocket('ws://localhost:7070/ws/19');
  		socket.onmessage = function(event){
@@ -126,8 +130,6 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
 	 			var stopdot = d3.select('[data-id="' + target_stop_id + '"]');
 	 			var route = "line" + train.trip.route_id.substring(0,1).toLowerCase();
 	 			var status = train.current_status_text.replace(/ /g, "").toLowerCase();
-
-	 			//stopdot.attr('class', route + " " + status);
 	 			
 	 			// see if a train exists
 	 			var newtrain = false;
@@ -144,9 +146,11 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
 
 	 			}
 	 			else{
-	 				console.log(movingtrain.attr('class') + " moving to " + route + " " + status);
 	 				movingtrain.attr('class', "train " + route + " " + status);
 	 			}
+
+	 			//mark the train as active
+	 			movingtrain.attr('data-active', 1);
 
 	 			//move the train to its new location
 	 			var rotation = 0;
@@ -181,7 +185,6 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
 	 			else
 	 			{
 	 				if(status == "intransitto"){
-	 					console.log(status + ":" + movingtrain.attr('data-id') + " toward " + stopdot.attr('data-name'));
 	 					//TODO: Note that this algorithm creates a Zeno's Paradox effect. Not terrible, but a little weird.
 						//find where the train is now
 						var curx = d3.transform(movingtrain.attr("transform")).translate[0];
@@ -195,8 +198,6 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
 						// add halfway to new stop
 						movex += curx;
 						movey += cury;
-						console.log("moving transiting train to " + movex + ", " + movey + " en route to " + stopdot.attr('cx') + ", " + stopdot.attr('cy'));
-
 					}
 					else
 					{
