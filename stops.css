@@ -1,3 +1,9 @@
+body {
+	width: 100%;
+	background-color:#fff;
+	color:#333;
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
 .station {
 	fill: none;
 	stroke: #cccccc;
@@ -84,5 +90,27 @@
 }
 
 .svgmap {
+	display:block;
+	margin-left: auto;
+	margin-right: auto;
 	fill: url(#bgmap);
+}
+
+.jumbotron {
+	padding:30px;
+	margin-bottom:30px;
+	color:inherit;
+	background-color: #eee;
+	display: block;
+}
+
+.jumbotron h1 {
+	font-size:63px;
+	font-weight:500;
+	margin-top:0px;
+}
+
+.jumbotron p {
+	font-size:21px;
+	font-weight:200;
 }

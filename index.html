@@ -7,6 +7,29 @@
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://d3js.org/topojson.v1.min.js"></script>
+
+<div class="jumbotron">
+	<h1>MTA NYC Train Status</h1>
+	<p>Live map of current train positions throughout the New York City MTA Subway network, as reported by MTA's Real Time Data Feed. Trains are depicted as triangles, colored according to their lines using official MTA colors. Triangles pointing up are trains traveling roughly northbound; triangles pointing down are trains heading roughly southbound.</p>
+	<strong>Note:</strong> The feed includes information for the 1, 2, 3, 4, 5, 6, L, and Grand Central Shuttle only. No information on lettered lines or the 7 train is available at this time.
+
+	<p><strong>Legend:</strong><br />
+		<svg width="20" height="20">
+			<circle cx="10" cy="10" class="station" r="3"></circle>
+		</svg> Subway stop<br />
+		<svg width="20" height="20">
+			<path d="M0,-3.7224194364083982L4.298279727294168,3.7224194364083982 -4.298279727294168,3.7224194364083982Z" class="train line1 intransitto" transform="translate(10,10)"></path>
+		</svg> Train is in transit to the next station.<br />
+		<svg width="20" height="20">
+			<path d="M0,-3.7224194364083982L4.298279727294168,3.7224194364083982 -4.298279727294168,3.7224194364083982Z" class="train line1 incomingat" transform="translate(10,10)"></path>
+		</svg> Train is arriving at the station.<br />
+		<svg width="20" height="20">
+			<path d="M0,-3.7224194364083982L4.298279727294168,3.7224194364083982 -4.298279727294168,3.7224194364083982Z" class="train line1 stoppedat" transform="translate(10,10)"></path>
+		</svg> Train is stopped at the station.
+	</p>
+
+</div>
+
 <script>
 
 var width = 960,
@@ -34,7 +57,8 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
 	centerlat = centerlat + extents.south;
 	
 	//set a background image where this map is located
-	bgurl = "http://api.tiles.mapbox.com/v4/mboggie.jdna5g96/"+(centerlon+0.002)+","+centerlat+",12/"+width+"x"+height+".png64?access_token=pk.eyJ1IjoibWJvZ2dpZSIsImEiOiIyaFpVeU9rIn0.9XvdKyRmTIxfZz3wddfUtw";
+	var zoomlevel = 12;
+	bgurl = "http://api.tiles.mapbox.com/v4/mboggie.jdna5g96/"+(centerlon+0.002)+","+centerlat+","+ zoomlevel+"/"+width+"x"+height+".png64?access_token=pk.eyJ1IjoibWJvZ2dpZSIsImEiOiIyaFpVeU9rIn0.9XvdKyRmTIxfZz3wddfUtw";
 
 	defs
 		.append('svg:pattern')
@@ -56,25 +80,7 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
 		.attr('width', width)
 		.attr('height', height);
 
-	var mapmargin = 0.005;
-	extents.east += mapmargin;
-	extents.west -= mapmargin;
-	extents.north += mapmargin;
-	extents.south -= mapmargin;
-
-	var xspan = extents.east - extents.west;
-	xspan = xspan;
-	console.log('xw:' + xspan);
-	var yspan = extents.south - extents.north;
-	yspan = yspan;
-	console.log('yw:' + yspan);
-	console.log('geo aspect ratio:' + xspan +'/'+ yspan);
-	console.log('img aspect ratio:' + width + '/' + height);
-
 	d3.json("mapdata/stops.json", function(error, stops) {
-
- 		var stopx, stopy;
- 		console.log(stops);
 
  		var stop_positions = [];
  		var stoploc = [];
@@ -86,10 +92,6 @@ d3.json("mapdata/pointextent.json", function(error, edges) {
  		for (var i = stops.length - 1; i >= 0; i--) {
  			if (stops[i].location_type == 1) {
  				stoploc = projection([stops[i].stop_lon, stops[i].stop_lat]);
-
- 				// stopx = (stops[i].stop_lon - extents.west)/xspan*(width);
- 				// stopy = (stops[i].stop_lat - extents.north)/yspan*(height);
- 				//draw a circle at stopx, stopy with id stop_id and alt text stop_name
  				stop_positions.push({"x": stoploc[0], "y": stoploc[1], "name": stops[i].stop_name, "id": stops[i].stop_id});
 
  			}
